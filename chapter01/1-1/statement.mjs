@@ -2,11 +2,14 @@ export default function statement(invoice, plays) {
   let totalAmount = 0;
   let volumeCredits = 0;
   let result = `청구내역 (고객명: ${invoice.customer})\n`;
-  const format = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 2,
-  }).format;
+
+  function format(aNumber) {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      maximumFractionDigits: 2,
+    }).format(aNumber);
+  }
 
   // 긴 함수를 리팩터링 할 때는 전체 동작을 부분으로 나눌수있는 지점을 찾는다.
   function amountFor(aPerformance) {
