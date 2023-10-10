@@ -47,7 +47,6 @@ export default function statement(invoice, plays) {
   }
 
   for (let perf of invoice.performances) {
-    volumeCredits += volumeCreditsFor(perf);
     if ('comedy' === playFor(perf).type) {
       volumeCredits += Math.floor(perf.audience / 5);
     }
@@ -58,6 +57,12 @@ export default function statement(invoice, plays) {
     }석\n`;
     totalAmount += amountFor(perf);
   }
+
+  // 값 누적 로직을 별도 for문으로 분리
+  for (let perf of invoice.performances) {
+    volumeCredits += volumeCreditsFor(perf);
+  }
+
   result += `총액 ${usd(totalAmount)}\n`;
   result += `적립 포인트 ${volumeCredits}점\n`;
 
