@@ -31,8 +31,12 @@ export default function statement(invoice, plays) {
     return result;
   }
 
+  function playFor(aPerformance) {
+    return plays[aPerformance.playID];
+  }
+
   for (let perf of invoice.performances) {
-    const play = plays[perf.playID];
+    const play = playFor(perf); // 우변을 함수로 추출
     let thisAmount = amountFor(perf, play); // 추출한 함수 이용
 
     // 포인트를 적립한다.
