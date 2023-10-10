@@ -8,8 +8,8 @@ export default function statement(invoice, plays) {
     maximumFractionDigits: 2,
   }).format;
 
-  for (let perf of invoice.performances) {
-    const play = plays[perf.playID];
+  // 긴 함수를 리팩터링 할 때는 전체 동작을 부분으로 나눌수있는 지점을 찾는다.
+  function amountFor(perf, play) {
     let thisAmount = 0;
     switch (play.type) {
       case 'tragedy': //비극
@@ -28,6 +28,12 @@ export default function statement(invoice, plays) {
       default:
         throw new Error(`알 수 없는 장르: ${play.type}`);
     }
+    return thisAmount;
+  }
+
+  for (let perf of invoice.performances) {
+    const play = plays[perf.playID];
+    let thisAmount = amountFor(perf, play); // 추출한 함수 이용
 
     // 포인트를 적립한다.
     volumeCredits += Math.max(perf.audience - 30, 0);
