@@ -1,13 +1,13 @@
 export default function statement(invoice, plays) {
   let result = `청구내역 (고객명: ${invoice.customer})\n`;
-
-  function usd(aNumber) {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      maximumFractionDigits: 2,
-    }).format(aNumber / 100);
+  for (let perf of invoice.performances) {
+    result += `${playFor(perf).name}: ${usd(amountFor(perf))} ${
+      perf.audience
+    }석\n`;
   }
+  result += `총액 ${usd(totalAmount())}\n`;
+  result += `적립 포인트 ${totalVolumeCredits()}점\n`;
+  return result;
 
   function totalAmount() {
     let result = 0;
@@ -17,11 +17,34 @@ export default function statement(invoice, plays) {
     return result;
   }
 
+  function totalVolumeCredits() {
+    let result = 0;
+    for (let perf of invoice.performances) {
+      result += volumeCreditsFor(perf);
+    }
+    return result;
+  }
+
+  function usd(aNumber) {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      maximumFractionDigits: 2,
+    }).format(aNumber / 100);
+  }
+
+  function volumeCreditsFor(aPerformance) {
+    let result = 0;
+    result += Math.max(aPerformance.audience - 30, 0);
+    if ('comedy' === playFor(aPerformance).type)
+      result += Math.floor(aPerformance.audience / 5);
+    return result;
+  }
+
   function playFor(aPerformance) {
     return plays[aPerformance.playID];
   }
 
-  // 긴 함수를 리팩터링 할 때는 전체 동작을 부분으로 나눌수있는 지점을 찾는다.
   function amountFor(aPerformance) {
     let result = 0;
     switch (playFor(aPerformance).type) {
@@ -43,30 +66,4 @@ export default function statement(invoice, plays) {
     }
     return result;
   }
-
-  function volumeCreditsFor(aPerformance) {
-    let result = 0;
-    result += Math.max(aPerformance.audience - 30, 0);
-    if ('comedy' === playFor(aPerformance).type)
-      result += Math.floor(aPerformance.audience / 5);
-    return result;
-  }
-
-  function totalVolumeCredits() {
-    let result = 0;
-    for (let perf of invoice.performances) {
-      result += volumeCreditsFor(perf);
-    }
-    return result;
-  }
-  for (let perf of invoice.performances) {
-    // 청구 내역을 출력한다.
-    result += `${playFor(perf).name}: ${usd(amountFor(perf))} ${
-      perf.audience
-    }석\n`;
-  }
-  result += `총액 ${usd(totalAmount())}\n`;
-  result += `적립 포인트 ${totalVolumeCredits()}점\n`;
-
-  return result;
 }
