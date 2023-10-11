@@ -1,10 +1,13 @@
 export default function statement(invoice, plays) {
+  return renderPlainText(createStatementData(invoice, plays));
+}
+function createStatementData(invoice, plays) {
   const statementData = {};
   statementData.customer = invoice.customer;
   statementData.performances = invoice.performances.map(enrichPerformance);
   statementData.totalAmount = totalAmount(statementData);
   statementData.totalVolumeCredits = totalVolumeCredits(statementData);
-  return renderPlainText(statementData, plays);
+  return statementData;
 
   function totalAmount(data) {
     return data.performances.reduce((total, p) => total + p.amount, 0); // for 반복문을 파이프라인으로 바꿈
