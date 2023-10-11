@@ -1,9 +1,11 @@
 export default function statement(invoice, plays) {
-  return renderPlainText(invoice, plays);
+  const statementData = {};
+  statement.customer = invoice.customer; // 고객 데이터를 중간 데이터로 옮김
+  return renderPlainText(statementData, invoice, plays);
 }
 
-function renderPlainText(invoice, plays) {
-  let result = `청구내역 (고객명: ${invoice.customer})\n`;
+function renderPlainText(data, invoice, plays) {
+  let result = `청구내역 (고객명: ${data.customer})\n`; // 고객 데이터를 중간 데이터로부터 얻음
   for (let perf of invoice.performances) {
     result += `${playFor(perf).name}: ${usd(amountFor(perf))} ${
       perf.audience
