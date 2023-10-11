@@ -1,8 +1,13 @@
 export default function statement(invoice, plays) {
   const statementData = {};
-  statementData.customer = invoice.customer; // 고객 데이터를 중간 데이터로 옮기기
-  statementData.performances = invoice.performances; // 공연 정보를 중간 데이터로 옮기기
-  return renderPlainText(statementData, plays); // 필요없어진 invoice 인수 삭제
+  statementData.customer = invoice.customer;
+  statementData.performances = invoice.performances.map(enrichPerformance);
+  return renderPlainText(statementData, plays);
+
+  function enrichPerformance(aPerformance) {
+    const result = Object.assign({}, aPerformance); // 얕은 복사 수행. 이유:함수로 전달한 데이터를 수정하기 싫어서
+    return result;
+  }
 }
 
 function renderPlainText(data, plays) {
