@@ -1,10 +1,10 @@
 export default function createStatementData(invoice, plays) {
-  const statementData = {};
-  statementData.customer = invoice.customer;
-  statementData.performances = invoice.performances.map(enrichPerformance);
-  statementData.totalAmount = totalAmount(statementData);
-  statementData.totalVolumeCredits = totalVolumeCredits(statementData);
-  return statementData;
+  const result = {};
+  result.customer = invoice.customer;
+  result.performances = invoice.performances.map(enrichPerformance);
+  result.totalAmount = totalAmount(result);
+  result.totalVolumeCredits = totalVolumeCredits(result);
+  return result;
 
   function totalAmount(data) {
     return data.performances.reduce((total, p) => total + p.amount, 0); // for 반복문을 파이프라인으로 바꿈
@@ -15,8 +15,12 @@ export default function createStatementData(invoice, plays) {
   }
 
   function enrichPerformance(aPerformance) {
+    const calculator = new PerfomanceCalculator(
+      aPerformance,
+      playFor(aPerformance)
+    ); // 공연료 계산기 생성 // 공연정보를 계산기로 전달
     const result = Object.assign({}, aPerformance);
-    result.play = playFor(result);
+    result.play = calculator.play;
     result.amount = amountFor(result);
     result.volumeCredits = volumeCreditsFor(result);
     return result;
@@ -54,5 +58,12 @@ export default function createStatementData(invoice, plays) {
     if ('comedy' === aPerformance.play.type)
       result += Math.floor(aPerformance.audience / 5);
     return result;
+  }
+}
+
+class PerfomanceCalculator {
+  constructor(aPerformance, aPlay) {
+    this.performances = aPerformance;
+    this.play = aPlay;
   }
 }
