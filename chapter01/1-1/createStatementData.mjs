@@ -15,10 +15,10 @@ export default function createStatementData(invoice, plays) {
   }
 
   function enrichPerformance(aPerformance) {
-    const calculator = new PerfomanceCalculator(
+    const calculator = new createPerfomanceCalculator(
       aPerformance,
       playFor(aPerformance)
-    ); // 공연료 계산기 생성 // 공연정보를 계산기로 전달
+    );
     const result = Object.assign({}, aPerformance);
     result.play = calculator.play;
     result.amount = calculator.amount;
@@ -47,25 +47,7 @@ class PerfomanceCalculator {
   }
 
   get amount() {
-    let result = 0;
-    switch (this.play.type) {
-      case 'tragedy': //비극
-        result = 40000;
-        if (this.performances.audience > 30) {
-          result += 1000 * (this.performances.audience - 30);
-        }
-        break;
-      case 'comedy': //희극
-        result = 30000;
-        if (this.performances.audience > 20) {
-          result += 10000 + 500 * (this.performances.audience - 20);
-        }
-        result += 300 * this.performances.audience;
-        break;
-      default:
-        throw new Error(`알 수 없는 장르: ${this.play.type}`);
-    }
-    return result;
+    throw new Error('서브클래스에서 처리하도록 설계되었습니다.');
   }
 
   get volumeCredits() {
@@ -73,6 +55,37 @@ class PerfomanceCalculator {
     result += Math.max(this.performances.audience - 30, 0);
     if ('comedy' === this.play.type)
       result += Math.floor(this.performances.audience / 5);
+    return result;
+  }
+}
+
+function createPerfomanceCalculator(aPerformance, aPlay) {
+  switch (aPlay.type) {
+    case 'tragedy':
+      return new TragedyCalculator(aPerformance, aPlay);
+    case 'comedy':
+      return new ComedyCalculator(aPerformance, aPlay);
+    default:
+      throw new Error(`알수없는 장르: ${aPlay.type}`);
+  }
+}
+
+class TragedyCalculator extends PerfomanceCalculator {
+  get amount() {
+    let result = 40000;
+    if (this.performances.audience > 30) {
+      result += 1000 * (this.performances.audience - 30);
+    }
+    return result;
+  }
+}
+class ComedyCalculator extends PerfomanceCalculator {
+  get amount() {
+    let result = 30000;
+    if (this.performances.audience > 20) {
+      result += 10000 + 500 * (this.performances.audience - 20);
+    }
+    result += 300 * this.performances.audience;
     return result;
   }
 }
